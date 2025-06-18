@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Empréstimo de Livros</title>
+  <link rel="stylesheet" href="css/emp.css">
+</head>
+<body>
+  <header>
+    <h1 style="margin: 0;">Empréstimo de Livros</h1>
+    <a href="home.html" class="botao-inicio">Início</a>
+  </header>
+
+  <main>
+    <h2>Realizar Empréstimo</h2>
+    <form id="formEmprestimo">
+      <label for="livro">Livro:</label>
+      <input type="text" id="livro" required />
+
+      <label for="nomeAluno">Nome do Aluno:</label>
+      <input type="text" id="nomeAluno" required />
+
+      <label for="serie">Série:</label>
+      <select id="serie" required>
+        <option value="">Selecione</option>
+        <option>1º Ano</option>
+        <option>2º Ano</option>
+        <option>3º Ano</option>
+      </select>
+
+      <label for="curso">Curso:</label>
+      <select id="curso" required>
+        <option value="">Selecione</option>
+        <option>Téc. em Administração</option>
+        <option>Téc. em Agronegócio</option>
+        <option>Téc. em Desenvolvimento De Sistemas</option>
+        <option>Téc. em Enfermagem</option>
+      </select>
+
+      <button type="submit">Emprestar Livro</button>
+    </form>
+
+    <h2>Livros Emprestados</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Livro</th>
+          <th>Aluno</th>
+          <th>Série</th>
+          <th>Curso</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody id="tabelaEmprestimos"></tbody>
+    </table>
+  </main>
+
+  <script>
+    const formulario = document.getElementById("formEmprestimo");
+    const tabela = document.getElementById("tabelaEmprestimos");
+
+    function carregarEmprestimos() {
+      const emprestimos = JSON.parse(localStorage.getItem("emprestimos")) || [];
+      tabela.innerHTML = "";
+
+      emprestimos.forEach((e, index) => {
+        const linha = document.createElement("tr");
+        linha.innerHTML = `
+          <td>${e.livro}</td>
+          <td>${e.aluno}</td>
+          <td>${e.serie}</td>
+          <td>${e.curso}</td>
+          <td><button class="devolver" onclick="removerEmprestimo(${index})">Devolver</button></td>
+        `;
+        tabela.appendChild(linha);
+      });
+    }
+
+    formulario.addEventListener("submit", function (event) {
+      event.preventDefault();
+
+      const emprestimos = JSON.parse(localStorage.getItem("emprestimos")) || [];
+
+      const novo = {
+        livro: document.getElementById("livro").value,
+        aluno: document.getElementById("nomeAluno").value,
+        serie: document.getElementById("serie").value,
+        curso: document.getElementById("curso").value,
+      };
+
+      emprestimos.push(novo);
+      localStorage.setItem("emprestimos", JSON.stringify(emprestimos));
+
+      formulario.reset();
+      carregarEmprestimos();
+    });
+
+    function removerEmprestimo(index) {
+      const emprestimos = JSON.parse(localStorage.getItem("emprestimos")) || [];
+      emprestimos.splice(index, 1);
+      localStorage.setItem("emprestimos", JSON.stringify(emprestimos));
+      carregarEmprestimos();
+    }
+
+    // Carregar os empréstimos ao abrir a página
+    carregarEmprestimos();
+  </script>
+</body>
+</html>

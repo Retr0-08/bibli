@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cadastro de Alunos - Biblioteca EEEP</title>
+  <link rel="stylesheet" href="css/alun.css">
+</head>
+<body>
+  <header>
+    <h1>Biblioteca EEEP</h1>
+    <nav>
+      <a href="home.html">Sair</a>
+    </nav>
+  </header>
+
+  <main>
+    <h2>👨‍🎓 Cadastro de Alunos</h2>
+
+    <form onsubmit="adicionarAluno(event)">
+      <input type="text" id="nome" placeholder="Nome do aluno" required>
+      <select id="serie">
+        <option value="1º Ano">1º Ano</option>
+        <option value="2º Ano">2º Ano</option>
+        <option value="3º Ano">3º Ano</option>
+      </select>
+      <select id="curso">
+        <option value="Administração">Téc. em Administração</option>
+        <option value="Agronegócio">Téc. em Agronegócio</option>
+        <option value="Desenvolvimento de Sistemas">Téc. em Desenvolvimento de Sistemas</option>
+        <option value="Enfermagem">Téc. em Enfermagem</option>
+      </select>
+      <input type="text" id="historico" placeholder="Histórico de livros lidos">
+      <button type="submit">Cadastrar</button>
+    </form>
+
+    <input type="text" id="pesquisa" oninput="filtrarAlunos()" placeholder="Pesquisar aluno...">
+
+    <table>
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Série</th>
+          <th>Curso</th>
+          <th>Histórico de Livros Lidos</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody id="tabela-alunos">
+        <!-- Alunos serão adicionados aqui -->
+      </tbody>
+    </table>
+  </main>
+
+  <script>
+    let alunos = JSON.parse(localStorage.getItem("alunos")) || [];
+
+    function atualizarTabela() {
+      const tabela = document.getElementById("tabela-alunos");
+      tabela.innerHTML = "";
+
+      alunos.forEach((aluno, index) => {
+        const linha = document.createElement("tr");
+        linha.innerHTML = `
+          <td>${aluno.nome}</td>
+          <td>${aluno.serie}</td>
+          <td>${aluno.curso}</td>
+          <td>${aluno.historico}</td>
+          <td class="acoes">
+            <button onclick="editarAluno(${index})">Editar</button>
+            <button onclick="excluirAluno(${index})">Excluir</button>
+          </td>
+        `;
+        tabela.appendChild(linha);
+      });
+    }
+
+    function adicionarAluno(event) {
+      event.preventDefault();
+      const nome = document.getElementById("nome").value;
+      const serie = document.getElementById("serie").value;
+      const curso = document.getElementById("curso").value;
+      const historico = document.getElementById("historico").value;
+
+      alunos.push({ nome, serie, curso, historico });
+      localStorage.setItem("alunos", JSON.stringify(alunos));
+      atualizarTabela();
+
+      document.getElementById("nome").value = "";
+      document.getElementById("serie").value = "1º Ano";
+      document.getElementById("curso").value = "Administração";
+      document.getElementById("historico").value = "";
+    }
+
+    function editarAluno(index) {
+      const aluno = alunos[index];
+
+      document.getElementById("nome").value = aluno.nome;
+      document.getElementById("serie").value = aluno.serie;
+      document.getElementById("curso").value = aluno.curso;
+      document.getElementById("historico").value = aluno.historico;
+
+      alunos.splice(index, 1);
+      localStorage.setItem("alunos", JSON.stringify(alunos));
+      atualizarTabela();
+    }
+
+    function excluirAluno(index) {
+      alunos.splice(index, 1);
+      localStorage.setItem("alunos", JSON.stringify(alunos));
+      atualizarTabela();
+    }
+
+    function filtrarAlunos() {
+      const termo = document.getElementById("pesquisa").value.toLowerCase();
+      const linhas = document.querySelectorAll("#tabela-alunos tr");
+
+      linhas.forEach(linha => {
+        const nome = linha.children[0].textContent.toLowerCase();
+        linha.style.display = nome.includes(termo) ? "" : "none";
+      });
+    }
+
+    window.onload = atualizarTabela;
+  </script>
+</body>
+</html>
